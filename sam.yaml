@@ -4,8 +4,8 @@ Resources:
   HandlerFunction:
     Type: AWS::Serverless::Function
     Properties: 
-      CodeUri: ./
-      Description: api handler function
+      CodeUri: ./ #s3://apicfn/roleTest.zip
+      Description: Get token function
       FunctionName: !Join ["-", [{"Ref": "AWS::StackName"}, "roleTest"]]
       Handler: handler.roleTest
       MemorySize: 128
@@ -13,9 +13,532 @@ Resources:
       Role: arn:aws:iam::337004021793:role/lambda_basic_execution
       Runtime: nodejs6.10
       Timeout: 5
-      Events:
-        MyTimeApi:
-          Type: Api
-          Properties:
-            Path: /api
-            Method: GET
+  MsApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: {"Ref": "AWS::StackName"}
+      ApiKeySourceType: HEADER
+      EndpointConfiguration:
+        Types:
+          - EDGE
+      Body:
+        swagger: "2.0"
+        schemes:
+        - "https"
+        paths:
+          /acc/dept:
+            x-amazon-apigateway-any-method:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - sigv4: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                credentials: !ImportValue apiGatewayRole1
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /acc/dept/{dept-id}:
+            x-amazon-apigateway-any-method:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "dept-id"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - sigv4: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                credentials: !ImportValue apiGatewayRole1
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /acc/dept/{dept-id}/flows:
+            x-amazon-apigateway-any-method:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "dept-id"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - sigv4: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                credentials: !ImportValue apiGatewayRole1
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /acc/dept/{dept-id}/queues:
+            x-amazon-apigateway-any-method:
+              produces:
+              - "application/json"
+              parameters:
+              - name: "dept-id"
+                in: "path"
+                required: true
+                type: "string"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - sigv4: []
+              - api_key: []
+              x-amazon-apigateway-integration:
+                credentials: !ImportValue apiGatewayRole1
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /credentials:
+            get:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              security:
+              - wtw-auth: []
+              - api_key: []
+              x-amazon-apigateway-request-validator: "Validate query string parameters and\
+                \ headers"
+              x-amazon-apigateway-integration:
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            options:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+          /login:
+            post:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              security:
+              - api_key: []
+              x-amazon-apigateway-integration:
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+            options:
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                uri: !Join ["", ["arn:aws:apigateway:", {"Ref": "AWS::Region"}, ":lambda:path/2015-03-31/functions/", !GetAtt HandlerFunction.Arn, "/invocations"]]
+                responses:
+                  default:
+                    statusCode: "200"
+                passthroughBehavior: "when_no_match"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws_proxy"
+        securityDefinitions:
+          api_key:
+            type: "apiKey"
+            name: "x-api-key"
+            in: "header"
+          sigv4:
+            type: "apiKey"
+            name: "Authorization"
+            in: "header"
+            x-amazon-apigateway-authtype: "awsSigv4"
+          poolauth:
+            type: "apiKey"
+            name: "Authorization"
+            in: "header"
+            x-amazon-apigateway-authtype: "cognito_user_pools"
+            x-amazon-apigateway-authorizer:
+              providerARNs:
+              - !GetAtt AccPool.Arn
+              type: "cognito_user_pools"
+        definitions:
+          Empty:
+            type: "object"
+            title: "Empty Schema"
+        x-amazon-apigateway-request-validators:
+          Validate query string parameters and headers:
+            validateRequestParameters: true
+            validateRequestBody: false
+  ApiKey: 
+    Type: AWS::ApiGateway::ApiKey
+    Properties: 
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Description: "CloudFormation API Key V1"
+      Enabled: true
+      GenerateDistinctId: false
+      # StageKeys: 
+        # - RestApiId: !Ref MsApi
+          # StageName: !Ref TestStage
+  TestStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: poc
+      Description: POC Stage
+      RestApiId: !Ref MsApi
+      DeploymentId: !Ref PublishAPI
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          MetricsEnabled: false
+          DataTraceEnabled: true
+          ThrottlingRateLimit: 6
+          ThrottlingBurstLimit: 3
+          LoggingLevel: INFO
+  UpdateStage:
+    Type: AWS::CloudFormation::CustomResource
+    DeletionPolicy: Delete
+    DependsOn:
+      - TestStage
+    Properties:
+      ServiceToken: !ImportValue updateStageLambda
+      RestApiId: !Ref MsApi
+      StageName: !Ref TestStage
+      LogArn: arn:aws:logs:us-east-2:337004021793:log-group:/aws/lambda/roleTest
+  PublishAPI:
+    Type: "AWS::ApiGateway::Deployment"
+    Properties:
+      Description: !Join [" ", [{"Ref": "AWS::StackName"}, MsApi]]
+      RestApiId: !Ref MsApi
+      StageName: test
+  ApiUsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    Properties:
+      ApiStages: 
+      - ApiId: !Ref MsApi
+        Stage: !Ref TestStage     
+      Description: !Join [" ", [{"Ref": "AWS::StackName"}, "usage plan"]]
+      Quota:
+        Limit: 2000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 10
+        RateLimit: 10
+      UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
+  ApiUsagePlanKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
+  LambdaPermission1:
+    Type: "AWS::Lambda::Permission"
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt HandlerFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Join ["", ["arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", !Ref MsApi, "/*/*/acc/dept"]]
+  LambdaPermission2:
+    Type: "AWS::Lambda::Permission"
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt HandlerFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Join ["", ["arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", !Ref MsApi, "/*/*/acc/dept/{dept-id}"]]
+  AccPool:
+    Type: "AWS::Cognito::UserPool"
+    DeletionPolicy: Delete
+    Properties:
+      UserPoolName: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}, "AccPool"]]
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+        UnusedAccountValidityDays: 7
+      AliasAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      DeviceConfiguration:
+        ChallengeRequiredOnNewDevice: false
+        DeviceOnlyRememberedOnUserPrompt: false
+      MfaConfiguration: 'OFF'
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: true
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+      #UserPoolAddOns:
+      #  AdvancedSecurityMode: OFF
+      Schema:
+        -
+          AttributeDataType: String
+          DeveloperOnlyAttribute: false
+          Mutable: false
+          Name: email
+          Required: true
+  AccPoolClient:
+    Type: "AWS::CloudFormation::CustomResource"
+    DeletionPolicy: Delete
+    DependsOn: AccPool
+    DependsOn: MsApi
+    Properties:
+      ServiceToken: !ImportValue createClientLambda
+      ClientName: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}]]
+      GenerateSecret: true
+      RefreshTokenValidity: 1
+      #RedirectURI: !Join ["", ["http://localhost:6768/portal.html?url=https://", !Ref MsApi, ".execute-api.", {"Ref": "AWS::Region"}, ".amazonaws.com/POC/token"]]
+      RedirectURI: http://localhost:6768/portal.html
+      UserPoolId: !Ref AccPool
+  UpdateAccPoolClient:
+    Type: "AWS::CloudFormation::CustomResource"
+    DeletionPolicy: Delete
+    DependsOn: AccIdenAdminPool
+    Properties:
+      ServiceToken: !ImportValue updateClientLambda
+      UserPoolId: !Ref AccPool
+      ClientId: !GetAtt AccPoolClient.UserPoolClientId
+      ClientName: !GetAtt AccPoolClient.ClientName
+      RedirectURI: !Join ["", ["http://localhost:6768/portal.html?", !Ref AccPool, "=", !Ref AccIdenAdminPool]]
+      GenerateSecret: true
+      RefreshTokenValidity: 1
+  AccPoolDomain:
+    Type: "AWS::CloudFormation::CustomResource"
+    DeletionPolicy: Delete
+    DependsOn: AccPool
+    Properties:
+      ServiceToken: !ImportValue createDomainLambda
+      Domain: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}]]
+      UserPoolId: !Ref AccPool
+  AccIdenAdminPool:
+    Type: "AWS::Cognito::IdentityPool"
+    Properties:
+      IdentityPoolName: !Join ["_", [{"Ref": "AWS::StackName"}, "admin"]]
+      AllowUnauthenticatedIdentities: false
+      CognitoIdentityProviders: 
+        - ClientId: !GetAtt AccPoolClient.UserPoolClientId
+          ProviderName: !Join ["", ["cognito-idp.", {"Ref": "AWS::Region"}, ".amazonaws.com/", !Ref AccPool]]
+          ServerSideTokenCheck: true
+  AccIdenAdminPoolRoleAttach:
+    Type: "AWS::CloudFormation::CustomResource"
+    DependsOn: AccIdenAdminPool
+    Properties:
+      ServiceToken: !ImportValue idPoolRoleLambda
+      IdentityPoolId: !Ref AccIdenAdminPool
+      PoolId: !Ref AccPool
+      ClientId: !GetAtt AccPoolClient.UserPoolClientId
+      Region: !Ref AWS::Region
+      RoleMappingParam:
+        Type: Token
+        AmbiguousRoleResolution: AuthenticatedRole
+      AuthenticatedRole: !GetAtt AccAdminRole.Arn
+  AdminGrp:
+    Type: "AWS::Cognito::UserPoolGroup"
+    DeletionPolicy: Delete
+    DependsOn: AccPool
+    Properties:
+      Description: Customer admin group
+      GroupName: AdminGroup
+      Precedence: 0
+      RoleArn: !GetAtt AccAdminRole.Arn
+      UserPoolId: !Ref AccPool
+  SuperGrp:
+    Type: "AWS::Cognito::UserPoolGroup"
+    DeletionPolicy: Delete
+    DependsOn: AccPool
+    Properties:
+      Description: Customer supervisor group
+      GroupName: SupervisorGroup
+      Precedence: 0
+      RoleArn: !GetAtt AccSuperRole.Arn
+      UserPoolId: !Ref AccPool
+  AdminUser:
+    Type: "AWS::CloudFormation::CustomResource"
+    DeletionPolicy: Delete
+    DependsOn: AccPool
+    Properties:
+      ServiceToken: !ImportValue createUserLambda
+      UserName: !Join ["", [{"Ref": "AWS::StackName"}, "-admin"]]
+      UserPool: !Ref AccPool
+  AttachGroup:
+    Type: "AWS::Cognito::UserPoolUserToGroupAttachment"
+    DeletionPolicy: Delete
+    DependsOn:
+      - AdminGrp
+      - AdminUser
+      - AccPool
+    Properties:
+      GroupName: !Ref AdminGrp
+      Username: !GetAtt AdminUser.UserName
+      UserPoolId: !Ref AccPool
+  AccAdminRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}, "accadminRole"]]
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Principal:
+              Federated: 
+                - "cognito-identity.amazonaws.com"
+            Condition:
+              StringEquals: 
+                cognito-identity.amazonaws.com:aud: !Ref AccIdenAdminPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+      Path: "/"
+  AccAdminPolicy:
+    Type: "AWS::IAM::Policy"
+    DependsOn: MsApi
+    Properties:
+      PolicyName: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}, "accadminPolicy"]]
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Action: "execute-api:Invoke"
+            Resource:
+              - !Join ["", [ "arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", !Ref MsApi, "/*/*", "/acc/*"]]
+      Roles: 
+        - 
+          Ref: AccAdminRole
+  AccSuperRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}, "AccSuperRole"]]
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Principal:
+              Federated: 
+                - "cognito-identity.amazonaws.com"
+            Condition:
+              StringEquals: 
+                cognito-identity.amazonaws.com:aud: !Ref AccIdenAdminPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+      Path: "/"
+  AccSuperPolicy:
+    Type: "AWS::IAM::Policy"
+    DependsOn: MsApi
+    Properties:
+      PolicyName: !Join ["-", [{"Ref": "AWS::Region"}, {"Ref": "AWS::StackName"}, "AccSuperPolicy"]]
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Action: "execute-api:Invoke"
+            Resource:
+              - !Join ["", [ "arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", !Ref MsApi, "/*/*", "/acc/dept/12/*"]]
+              - !Join ["", [ "arn:aws:execute-api:", {"Ref": "AWS::Region"}, ":", {"Ref": "AWS::AccountId"}, ":", !Ref MsApi, "/*/*", "/acc/dept/34/*"]]
+      Roles: 
+        - 
+          Ref: AccSuperRole
+Outputs:
+  apiId:
+    Description: API Id
+    Value: !Join ["", [ "https://", !Ref MsApi, ".execute-api.", {"Ref": "AWS::Region"}, ".amazonaws.com/", !Ref TestStage, "acc"]]
+  userPool:
+    Description: User Pool Id
+    Value: !Ref AccPool
+  identityPoolId:
+    Description: Identity Pool Id
+    Value: !Ref AccIdenAdminPool
+  authURL:
+    Description: Login URL for customer
+    Value: !Join ["", ["https://", !GetAtt AccPoolDomain.Domain, ".auth.", {"Ref": "AWS::Region"}, ".amazoncognito.com/login?response_type=token&client_id=", !GetAtt AccPoolClient.UserPoolClientId, "&redirect_uri=", !GetAtt UpdateAccPoolClient.RedirectURI]]
+  apiKey:
+    Description: API keys
+    Value: !Ref ApiKey
