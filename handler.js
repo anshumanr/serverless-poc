@@ -14,7 +14,7 @@ module.exports.roleTest = (event, context, callback) => {
             "Access-Control-Allow-Credentials" : true, // Required for cookies, authorization headers with HTTPS 
             "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,Access-Control-Allow-Origin"
         },
-        body : 'Access granted: ' + event.path + 'at ' + currentTime.toString(),
+        body : 'CI/CD: ' + event.path + ' at ' + currentTime.toString(),
     };
     callback(null, response);
 };
