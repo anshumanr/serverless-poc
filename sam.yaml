@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  HandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties: 
+      CodeUri: ./
+      Description: api handler function
+      FunctionName: !Join ["-", [{"Ref": "AWS::StackName"}, "roleTest"]]
+      Handler: handler.roleTest
+      MemorySize: 128
+      ReservedConcurrentExecutions: 2
+      Role: arn:aws:iam::337004021793:role/lambda_basic_execution
+      Runtime: nodejs6.10
+      Timeout: 5
+      Events:
+        MyTimeApi:
+          Type: Api
+          Properties:
+            Path: /api
+            Method: GET

@@ -1,0 +1,13 @@
+
+version: 0.1
+phases:
+  install:
+    commands:
+      - npm install time
+      - aws cloudformation package --template-file sam.yaml --s3-bucket apicfn 
+                                   --output-template-file outputSamTemplate.yaml
+artifacts:
+  type: zip
+  files:
+    - sam.yaml
+    - outputSamTemplate.yaml
